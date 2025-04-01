@@ -20,7 +20,7 @@ import {
 } from "@shogun-sdk/money-legos";
 import { useBalance, useLego } from "@shogun-sdk/money-legos-react";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { UserSettings } from "../user/settiings";
+// import { UserSettings } from "../user/settiings";
 import { sendTransaction, switchChain } from "wagmi/actions";
 import { BaseError, useConfig } from "wagmi";
 import toast from "react-hot-toast";
@@ -105,6 +105,7 @@ export const Swap = () => {
               `NFT purchase successful. Transaction hash: ${"txHash"}`
             );
           }
+          toast.success("You've successfully purchased the NFT!");
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -147,7 +148,7 @@ export const Swap = () => {
               Sweep the floor of Steady Teddies
             </h2>
             <div className="flex items-center gap-1">
-              <UserSettings />
+              {/* <UserSettings /> */}
               <Button
                 onClick={refresh}
                 variant="ghost"
