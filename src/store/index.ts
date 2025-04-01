@@ -47,7 +47,6 @@ export const useSwap = create<SwapState>()(
       partialize: (state) => ({
         tokenIn: state.tokenIn,
         slippage: state.slippage,
-        nftContractAddress: state.nftContractAddress,
       }),
     }
   )
