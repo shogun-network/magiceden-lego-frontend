@@ -105,6 +105,7 @@ export const Swap = () => {
               `NFT purchase successful. Transaction hash: ${"txHash"}`
             );
           }
+          toast.success("You've successfully purchased the NFT!");
         }
       } catch (error) {
         if (error instanceof Error) {
