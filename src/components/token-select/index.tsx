@@ -18,6 +18,7 @@ import {
   formatUnits,
   formatUSD,
   convertNumbThousand,
+  SOLANA_CHAIN_ID
 } from "@shogun-sdk/money-legos";
 import {
   useShogunBalances,
@@ -36,6 +37,7 @@ interface TokenSelectorDialogProps {
 }
 
 const PAGE_SIZE = 20;
+const includeSolana = process.env.NEXT_PUBLIC_DISABLE_SOLANA === "false";
 
 export default function TokenSelectorDialog({
   isOpen,
@@ -58,7 +60,7 @@ export default function TokenSelectorDialog({
     userEVMAddress: (isEVMChain(chainId as number)
       ? (address as string)
       : undefined) as string,
-    userSolanaAddress: (!isEVMChain(chainId as number)
+    userSolanaAddress: (!isEVMChain(chainId as number) && includeSolana
       ? address
       : undefined) as string,
   });
@@ -79,7 +81,10 @@ export default function TokenSelectorDialog({
   // Create a stable balance map that doesn't change unless balances change
   const balanceMap = useMemo(() => {
     // Combine EVM and Solana balances
-    const allBalances = [...(evmBalances || []), ...(solanaBalances || [])];
+    const allBalances = [
+      ...(evmBalances || []), 
+      ...(includeSolana ? (solanaBalances || []) : [])
+    ];
     const map = new Map<string, Token["balanceData"]>();
 
     allBalances.forEach((bal) => {
@@ -93,15 +98,23 @@ export default function TokenSelectorDialog({
     });
 
     return map;
-  }, [evmBalances, solanaBalances]);
+  }, [evmBalances, solanaBalances, includeSolana]);
 
   // Create a stable list of all tokens with balances
   const allTokensWithBalances = useMemo(() => {
     // Combine EVM and Solana balances
-    const allBalances = [...(evmBalances || []), ...(solanaBalances || [])];
+    const allBalances = [
+      ...(evmBalances || []), 
+      ...(includeSolana ? (solanaBalances || []) : [])
+    ];
 
-    // First, add balances to existing tokens in COMBINED_TOKEN_LIST
-    const existingWithBalances = COMBINED_TOKEN_LIST.map((token) => {
+    // Filter COMBINED_TOKEN_LIST to remove Solana tokens if not included
+    const filteredTokenList = includeSolana 
+      ? COMBINED_TOKEN_LIST 
+      : COMBINED_TOKEN_LIST.filter(token => token.chainId !== SOLANA_CHAIN_ID);
+
+    // First, add balances to existing tokens in filtered token list
+    const existingWithBalances = filteredTokenList.map((token) => {
       const key = `${token.address}-${token.chainId}`;
       const balanceData = balanceMap.get(key);
       return {
@@ -111,11 +124,14 @@ export default function TokenSelectorDialog({
       };
     });
 
-    // Then add any tokens from balances that aren't in COMBINED_TOKEN_LIST
+    // Then add any tokens from balances that aren't in filtered token list
     const tokensWithBalances = [...existingWithBalances];
 
     allBalances.forEach((bal) => {
       if (!bal) return;
+      // Skip Solana tokens if not included
+      if (!includeSolana && Number(bal.network) === SOLANA_CHAIN_ID) return;
+      
       const exists = tokensWithBalances.some(
         (t) =>
           t.address === bal.tokenAddress && t.chainId === Number(bal.network)
@@ -146,7 +162,7 @@ export default function TokenSelectorDialog({
       const bVal = b.balanceData?.usdValue ?? 0;
       return bVal - aVal;
     });
-  }, [balanceMap, evmBalances, solanaBalances]);
+  }, [balanceMap, evmBalances, solanaBalances, includeSolana]);
 
   // Filter tokens based on search query
   const filteredTokens = useMemo(() => {
@@ -168,6 +184,9 @@ export default function TokenSelectorDialog({
       const newList = [...filteredList];
 
       searchedToken.forEach((token) => {
+        // Skip Solana tokens if not included
+        if (!includeSolana && token.chainId === SOLANA_CHAIN_ID) return;
+        
         const exists = newList.some(
           (t) => t.address === token.address && t.chainId === token.chainId
         );
@@ -186,8 +205,8 @@ export default function TokenSelectorDialog({
       return newList;
     }
 
-    return filteredList;
-  }, [searchQuery, searchedToken, allTokensWithBalances, balanceMap]);
+    return includeSolana ? filteredList : filteredList.filter(token => token.chainId !== SOLANA_CHAIN_ID);;
+  }, [searchQuery, searchedToken, allTokensWithBalances, balanceMap, includeSolana]);
 
   // Stable handler functions that won't change with re-renders
   const handleSearchChange = useCallback(
