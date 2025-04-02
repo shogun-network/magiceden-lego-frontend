@@ -21,6 +21,8 @@ if (!projectId) {
   throw new Error("Project ID is not defined");
 }
 
+const includeSolana = process.env.NEXT_PUBLIC_DISABLE_SOLANA === "false";
+
 export const networks = [
   mainnet,
   arbitrum,
@@ -28,10 +30,10 @@ export const networks = [
   base,
   sonic,
   avalanche,
-  solana,
+  ...(includeSolana ? [solana] : []),
 ] as [AppKitNetwork, ...AppKitNetwork[]];
 
-//Set up the Wagmi Adapter (Config)
+// Set up the Wagmi Adapter (Config)
 export const wagmiAdapter = new WagmiAdapter({
   storage: createStorage({
     storage: cookieStorage,
@@ -44,4 +46,3 @@ export const wagmiAdapter = new WagmiAdapter({
 export const solanaWeb3JsAdapter = new SolanaAdapter();
 
 export const config = wagmiAdapter.wagmiConfig;
-

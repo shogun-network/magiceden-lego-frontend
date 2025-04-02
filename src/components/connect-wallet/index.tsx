@@ -1,8 +1,9 @@
 import { cn } from "@/lib/utils";
-import { useAppKit } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount, useAppKitState } from "@reown/appkit/react";
 import { motion } from "motion/react";
 export const ConnectWallet = () => {
-  const { open } = useAppKit();
+  const { open,  } = useAppKit();
+
   return (
     <motion.button
       whileHover={{ scale: 1.02 }}
