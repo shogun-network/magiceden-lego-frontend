@@ -1,4 +1,4 @@
-import { SOLANA_CHAIN_ID , NATIVE_TOKEN} from '@shogun-sdk/money-legos';
+import { SOLANA_CHAIN_ID , NATIVE_TOKEN, SOL_NATIVE} from '@shogun-sdk/money-legos';
 import { mainnet, base, arbitrum, bsc, berachain, sonic } from '@reown/appkit/networks';
 import { bera, bnb, eth, s, sol, wbera, wS } from '../assets/svgs';
 export const NATIVE_TOKENS = {
@@ -79,7 +79,7 @@ export const NATIVE_TOKENS = {
       name: 'Solana',
       symbol: 'SOL',
       decimals: 9,
-      address: NATIVE_TOKEN.SOL,
+      address:SOL_NATIVE,
       chainId: 7565164,
       image: sol,
     },

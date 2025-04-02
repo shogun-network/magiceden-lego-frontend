@@ -4,7 +4,7 @@ import { Token } from "@shogun-sdk/money-legos";
 import { NATIVE_TOKENS } from "@/constants /native-tokens";
 
 const DEFAULT_SLIPPAGE = 1;
-const DEFAULT_NFT_CONTRACT_ADDRESS = "0x88888888A9361f15AAdBAca355A6B2938C6A674e";
+const DEFAULT_NFT_CONTRACT_ADDRESS = "0x5e6aebdd3a7965f6fb050b349c0cbd3a57945c69";
 
 interface SwapState {
   tokenIn: Token;
